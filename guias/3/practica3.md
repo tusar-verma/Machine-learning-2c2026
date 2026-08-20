@@ -120,6 +120,22 @@ Estos ultimos pasos los hice viendo los datos porque son pocos y evidentes. Pero
 
 ### b
 
+- {Sol, frio, Normal, debil} = Si
+- (Nublado, Calor, Alta, Fuerte) = Si
+- (Lluvia, Normal, Alta, Fuerte) = No 
+
 ### c
 
+Fórmula de disminución media de la impureza: $$
+
 ### d
+
+Habria que definir que hacer con las ramas que se pasan en altura (caso cielo = sol y lluvia = viento). Por ejemplo si tomamos el valor de clasificación como la mayoria de la clase quedaría el siguiente arbol:
+
+![](img/arbol2niveles.png)
+
+Esto provoca que algunos de los datos de entrenamiento se clasifiquen mal.
+
+![alt text](img/clasificacionesArbol2Niveles.png)
+
+Son 4 clasificaciones erroneas.
