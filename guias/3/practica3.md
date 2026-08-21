@@ -126,7 +126,64 @@ Estos ultimos pasos los hice viendo los datos porque son pocos y evidentes. Pero
 
 ### c
 
-Fórmula de disminución media de la impureza: $$
+Fórmula de gini: $Gini(S) = 1-\sum_{k \in clases(k)} p(k)^2$
+
+Fórmula ganancia gini: $GiniGain(S, <a,c>) = Gini(S) - (Prop_\leq * Gini(S_\leq) + Prop_> * Gini(S_>))$
+
+Interpretación: 
+- gini de un nodo: que tan impuro es (si el nodo tiene elementos de una sola de las clases entonces es puro)
+- ganancia gini: cuanta impureza se elimina al hacer el corte por un atributo por algun valor en concreto $<a,c>$ (valores continuos o discretos).
+
+Algoritmo para calcular disminución media de la impureza: 
+
+![alt text](img/MeanDecreaseInImpurity.png)
+
+
+
+- Empezamos calculando gini en la raiz: $Gini(S) = 1-((5/14)^2 + (9/14)^2) \approx 0.45918$
+
+- Ahora calculamos el GiniGain de haber usado el cielo como primer atributo en el árbol: 
+  $Gini(S_{cielo=sol}) = 1 - ((2/5)^2 + (3/5)^2) = 0.48$  
+  $Gini(S_{cielo=nublado}) = 1 - ((4/4)^2 + (0/4)^2) = 0$  
+  $Gini(S_{cielo=lluvia}) = 1 - ((3/5)^2 + (2/5)^2) = 0.48$
+  $GiniGain(S, cielo) = 0.45918 - ((5/14)*0.48  + (4/14)*0 + (5/14)*0.48) \approx 0.116323$
+
+- La proporción de elementos sobre el total de instancias es 1, ya que es la primer partición: $w_{cielo} = 14/14 = 1$. Por lo tanto la importancia del atributo cielo es $I_{cielo} = 0.116323$
+
+---
+
+- Continuamos con la importancia en el siguiente nodo, correspondiente a la humedad. Aca la cantidad de instancias se reduce a aquellas con cielo=sol. Es decir, 5/14.
+- $Gini(S_{cielo=sol, humedad=alta}) = 1 - ((3/3)^2 + (0/3)^2) = 0$    
+  $Gini(S_{cielo=sol, humedad=normal}) = 1 - ((2/2)^2 + (0/2)^2) = 0$    
+- 
+$$
+\begin{align*}
+GiniGain(S_{sol}, humedad) &= Gini(S_{sol}) - (3/5 * Gini(S_{sol, humedad=alta}) + 2/5 * Gini(S_{sol, humedad=normal})) \\
+GiniGain(S_{sol}, humedad) &= 0.48 - (3/5 * 0 + 2/5 * 0) = 0.48
+\end{align*}
+$$ 
+- Entonces la importancia del atributo humedad es $I_{humedad} = 5/14 * 0.48 \approx 0.17143$
+
+---
+
+- Seguimos con el atributo Viento con proporción correspondiente a cielo=lluvia: 5/14
+- $Gini(S_{cielo=lluvia, Viento=debil}) = 1 - ((3/3)^2 + (0/3)^2) = 0$    
+  $Gini(S_{cielo=lluvia, Viento=fuerte}) = 1 - ((2/2)^2 + (0/2)^2) = 0$   
+$$
+\begin{align*}
+GiniGain(S_{lluvia}, Viento) &= Gini(S_{lluvia}) - (3/5 * Gini(S_{lluvia, Viento=devil}) + 2/5 * Gini(S_{lluvia, Viento=fuerte})) \\
+GiniGain(S_{lluvia}, Viento) &= 0.48 - (3/5 * 0 + 2/5 * 0) = 0.48
+\end{align*}
+$$ 
+
+- Entonces la importancia del atributo viento es igual al de humedad: $I_{viento} = 5/14 * 0.48 \approx 0.17143$
+
+---
+
+- Finalmente la importancia de la temperatura para este árbol es 0 al tener proporción 0 de las instancias para todos sus posibles valores (no se usó el atributo en la construcción del árbol):
+- $I_{temperatura} = \sum_{\text{Nodos donde se usa temperatura}} \frac{N_i}{N} * GiniGain_i$. Es decir, la suma de las ganancias por usar dicha atributo en un nodo ponderado a la proporción de instancias en esa altura del árbol.
+- Que para temperatura es $I_{temperatura}=\sum_{0} = 0$
+  
 
 ### d
 
