@@ -196,3 +196,104 @@ Esto provoca que algunos de los datos de entrenamiento se clasifiquen mal.
 ![alt text](img/clasificacionesArbol2Niveles.png)
 
 Son 4 clasificaciones erroneas.
+
+## Ejercicio 2
+
+Este ejercicio lo hago a ojo viendo cual seria el corte que reduzca mas la entropia.
+
+### 1
+
+![](img/arbolEj2-1.png)
+
+### 2
+
+![](img/planoCortesEj2-2.png)
+
+### 3
+
+Predice clase A (azul). Coincide con la clase real, y no afectaria a las fronteras si lo incorporamos al entrenamiento
+
+### 4
+
+Misma precidicción (clase A, azul). En este caso si cambiaría la frontera de decisión:
+la frontera dada por x=2 se reemplazaría por x=2.7
+
+### 5
+
+Si cambia. Como en mi algoritmo use los puntos para elegir los valores de corte, al cambiar la etiqueta de un punto (lo que seria el 10% aproximado del tamaño de la muestra) cambia al menos una frontera.
+
+### 6
+
+No cambia. Solo se ajusta los valores para tener en cuenta esta cambio de proporciones. Por ejemplo se normaliza ambos ejes a $m^2$
+
+### 7
+
+Se agregan diagonales de la forma $x+y <= a, a\in \R$
+
+
+## Ejercicio 3
+
+### a
+
+> supongo que los que tienen sombrero no son pelados
+
+Fórmula de gini: $Gini(S) = 1-\sum_{k \in clases(k)} p(k)^2$
+
+Fórmula ganancia gini: $GiniGain(S, <a,c>) = Gini(S) - (Prop_\leq * Gini(S_\leq) + Prop_> * Gini(S_>))$
+
+Tamaño de muestra: 24
+Cantidad de clases = 2 (Masc y fem)
+
+$Prop_(Masculino) = 19/24$
+$Prop_{calvo} = 5/24$
+
+$Gini(S) = 1 - ((19/24)^2 + (5/24)^2) \approx 0.32986$
+
+$Gini(S_{calvo}) = 1 - ((5/5)^2 + (0/5)^2) = 0$
+
+$Gini(S_{no calvo}) = 1 - ((14/19)^2 + (5/19)^2) \approx 0.38781$
+
+$GiniGain(S, calvo) = 0.32986 - (5/24 * (0) +  19/24 * (0.38781)) \approx 0.02284$
+
+## Ejercicio 4
+
+### a
+
+Aquellas que tienen cortes paralelos a los ejes x e y. Es decir, fig (1, 4)  y (2, 4), ambos con arboles de altura 3.
+
+El resto se puede aproximar con arboles pero se necesitan muchos nodos para crear las figuras de las columnas 2 y 3 y escalones chicos de las figuras de la columna 5
+
+## Ejercicio 5
+
+### a
+
+Entiendo que fueron entrenados en el mismo set de datos.
+
+Para el caso de atributos con todos valores discretos, el algoritmo usa una vez cada atributo. Por lo que la altura máxima es la cantidad de atributos. Y las ramificaciones en cada nodo corresponden a los valores que toma el atributo que se usó en ese nodo.
+
+Si los atributos tienen valores continuos entonces se pueden reutilizar en distintas partes del árbol. Pero la cantidad de ramificaciones es siempre 2 (menor o igual al valor y mayor al valor elegido).
+
+Ahora en el caso continuo, en el peor caso cada corte separa un unico dato del grupo. Si el tamaño de la muestra es $N$ entonces con $N-1$ cortes se separa todos los datos en grupos individuales.
+Entonces se tendría un árbol de altura $N-1$ (No balanceado).
+
+Pero como el ejercicio aclara que el árbol crece de manera balanceada entonces el analisis cambia:
+
+En cada corte se puede suponer que se divide la muestra en 2 (a la mitad perfectamente). De lo contrario, el árbol no terminaría balanceado.
+
+Con altura 12 se puede tener un arbol balanceado de máximo $2^0 + 2^1 + ... 2^12 = \sum_{0}^{12} 2^i = 2^13 - 1 = 8191 nodos$ de los cuales $2^12=4096$ son hojas. 
+Si el árbol no crece más, significa que llegó al máximo de performance y ya pudo clasificar correctamente a todos los datos de la muestra (cada elemento en su propio grupo individual). Y cada grupo es representado por una hoja.
+
+Si el tamaño de la muestra era < 4096 (y mayor a 2^11 para ocupar todo el nivel 11 del árbol) entonces con 12 niveles se estaria haciendo un corte para cada dato de la muestra. Y por esto no aumenta la altura real (agregar más cortes no disminuiría la entropía).
+
+Ahora bien, el tamaño de la muestra podría ser mayor, pero si los cortes los agrupan perfectamente entonces tampoco se necesitaría más altura (más cortes).
+
+### b
+
+Con 1000 instancias se necesita un arbol que soporte 1000 hojas (seguimos con la supocisión de árbol balanceado).
+
+$\lceil log_2(1000) \rceil = 10$
+
+### c
+
+- Los tipos de atributos, si son continuos o discretos. 
+- Si se obtiene una buena performance sin necesidad de tener un nodo por "grupo", la altura sería menor.
