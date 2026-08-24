@@ -297,3 +297,119 @@ $\lceil log_2(1000) \rceil = 10$
 
 - Los tipos de atributos, si son continuos o discretos. 
 - Si se obtiene una buena performance sin necesidad de tener un nodo por "grupo", la altura sería menor.
+
+## Ejercicio 6
+
+### a
+
+Falso. El objetivo es encontrar el mejor clasificador. Las hojas si van a tener el valor de la clase que se está clasificando.
+Sobre la altura del árbol, que sea el más corto es parte del sesgo inductivo de la busqueda del árbol: entre 2 árboles que clasifican un conjunto de datos de la misma forma, se preferirá el más corto (siguiendo el algoritmo visto en clase).
+
+
+### b
+
+Falso. Hacen una exploración greedy donde van eligiendo en cada paso un par (atributo, valor) en el caso continuo o atributo en el caso discreto que mejor separe a los datos siguiendo cierta medida de homogeneidad (entropía, gini, etc), y sin backtracking. Por lo tanto no se recorren todos los árboles posibles, pero un subconjunto de ellos.
+
+### c
+
+Verdadero para el caso de todos los atributos con valores discretos. Falso para el caso continuo, donde se permite hacer cortes en varios valores del atributo.
+
+### d
+
+Verdadero. Volver a usar el mismo corte en una rama no va a dividir los datos.
+
+### e
+
+Si con "criterio de corte" se refiere a cuando terminar el algoritmo de busqueda, Verdadero siempre y cuando los datos de entrenamiento no tengan errores/ruido. 
+Por ejemplo no se tiene un valor máximo para la altura del árbol, entonces se puede overfittear perfectamente los datos de entranmiento.
+
+(Leyendo la siguiente pregunta, se podría poner falso aca ya que no se debe asumir nada sobre los datos de entrenamiento)
+
+### f
+
+Verdadero.
+
+## Ejercicio 7
+
+Las hojas del árbol guardan la porción de los datos de entrenamiento que caerían en dicha hoja (junto a sus etiquetas).
+
+Dada una nueva instancia, se recorre el árbol para obtener la predicción de clasificación. Al llegar a la hoja se tiene algún criterio para elegir la clase, por ejemplo votación de mayoria. El resultado de la votación es la clase predicha para la nueva instancia. Y se puede usar la proporción de cada clase que hubo de los datos de entrenamiento en la hoja para obtener el vector de probabilidades.
+
+Por ejemplo, 3 clases y la hoja agrupa 10 nodos: 6 clase A, 3 clase B y 1 clase C. 
+La predicción será A y con vector (6/10, 3/10, 1/10)
+
+## Ejercicio 8
+
+### a
+
+El sesgo inductivo del algoritmo de busqueda impone preferencias en la busqueda. En el caso de los algoritmos vistos en clase, se prefiere aquellos árboles que mayor ganancia de homogeneidad aportan. Y las medidas de homogeneidad vistas son entropía, gini, CER (clasification error rate). 
+Para el caso de entropía la interpretación es que se busca en cada paso el corte que maximice la ganancia de información (o reducción de entropía).
+
+### b
+
+Si, para el caso de empate en la medida de homogeneidad se debe tener un criterio de desempate. Dicho criterio aporta una preferencia de busqueda (y por lo tanto forma parte del sesgo inductivo).
+
+## Ejercicio 9
+
+### a
+
+```python
+def mejor_corte(S, A, deltaM):
+  # en este diccionario  guardaremos clave atributo, valor un par con el corte de mayor reducción de entropia y su entropia atributo: (corte, entropia)  
+  entropia_maxima_por_atributo = {}
+
+  for a in A:
+    # como los atributos son de valor continuo, definimos un recorrido discreto tomando el minimo y maximo y haciendo maximo 20 saltos.
+    a_min = min (S[a])
+    a_max = max (S[a])
+
+    valor_salto = (a_max - a_min) / 20
+
+    valor_c
+    max_reduccion = -1
+
+    for c in range(a_min, a_max, valor_salto):
+      aux = deltaM(S, (a, valor_salto))
+      if max_reduccion < aux:
+        max_reduccion = aux
+        valor_c = c
+
+    entropia_maxima_por_atributo[a] = (valor_c, max_reduccion)
+
+  # del diccionario devolvemos el par con la tupla que mayor reduccion de entropia genere
+  return atributo_con_mejor_reduccion_entropia(entropia_maxima_por_atributo)
+```
+
+### b
+
+Como en el mejor corte use entropia, en cada paso hay que calcular cuanta información se gana (infoGain) ponderado por la proporción de instancias que se separan.
+
+En este caso agregamos un paso mas luego de II. El II elige el mejor corte usando la función que definimos. Luego se podría mantener un diccionario global donde se va calculando la importancia de cada atributo
+
+```python
+importancia_por_atributo = {a: 0 for a in A}
+
+...
+
+# (II)
+(a, c) = mejor_corte(S, A, infoGain)
+
+# calculo de importancia
+
+importancia_por_atributo[a] += infoGain(S, (a,c))
+```
+
+Se puede hacer un poco más eficiente:
+- en (IV) se hace la separación proporcional al corte (a,c), con eso tenemos los tamaños de instancias nuevos.
+- En mejor_corte() se podría guardar el info_gain para no volver a calcularlo
+
+
+## Ejercicio 10
+
+Dado un modelo ya entrenado y el valor de su performance $S$, se toma los datos de entrenamiento, se permutan los valores de uno de los atributos $a$ y se vuelve a calular una performance $S_a$. Esto se reepite k veces dando $I_a = S - \frac{1}{k} \sum_{i=1}^k S_{a, k}$.
+
+Si el atributo es importante se esperaría que al hacer las permutaciones la performance decrezca (empeore).Entonces $I_a$ va a ser más grande. Pero si tenia poca importancia, la performance no se deberia de ver muy afectada y daría cercano a 0.
+
+El problema de esta métrica es que analiza un atributo a la vez. Si tenemos 2 atributos altamente correlacionados $x_1, x_2$, al permutar los valores de $x_1$ y calcular la performance, el modelo podría estar aprovechando la correlación con $x_2$ y asi no se obtendría un empeoramiento de la perfornmance al medirlo. Lo mismo si se permuta los valores de $x_1$. Resultando en que ambos atributos tienen poca importancia al haber obtenido un rendimiento similar al original (Se permuto los valores de un atributo y se compensó con la correlación con el otro atributo, obteniendo resultados similares al modelo original).
+
+Luego se podría estar marcando erroneamente ambos atributos como poco importantes.
