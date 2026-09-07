@@ -97,7 +97,9 @@ Faltan los likelihoods.
 
 SVM con un kernel lineal fallaría por que no hay separación lineal posible.
 
-Con algun kernel polinomico se puede resolver. (Aprovechando la ecuación de un ciruclo $x_1^2 + x_2^2 = r$)
+Con un kernel radial se puede resolver. Dichos kernels aprovechan la noción de distancia local para armar las fronteras de decisión.
+
+> 9.3.2 The Support Vector Machine de [ISLP](../../ISLP_website-1.pdf)
 
 ## Ejercicio 7
 
