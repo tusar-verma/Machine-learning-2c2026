@@ -81,10 +81,28 @@ Faltan los likelihoods.
 
 ## Ejercicio 5
 
-
+Hecho en clase
 
 ## Ejercicio 6 
 
+SVM con un kernel lineal fallaría por que no hay separación lineal posible.
+
+Con algun kernel polinomico se puede resolver. (Aprovechando la ecuación de un ciruclo $x_1^2 + x_2^2 = r$)
+
 ## Ejercicio 7
 
+El primer sesgo corresponde a la independencia condicional de los atributos (dada la clase $Y=c$, los atributos son independientes), dando en el paso (5) la productoria del likelihood.
+
+El segundo sesgo, en el paso 7, es que las distribuciones de X | Y = c (cada atributo condicionado a una clase $c$) sigue una distribución normal con cierta media y desvio estandar.
+
 ## Ejercicio 8
+
+### 1
+
+### 2
+
+### 3
+
+### 4
+
+### 5
