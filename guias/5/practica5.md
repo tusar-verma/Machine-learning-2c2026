@@ -81,7 +81,17 @@ Faltan los likelihoods.
 
 ## Ejercicio 5
 
-Hecho en clase
+### a
+
+![a](ej5-a.png)
+
+### b
+
+![b](ej5-b.png)
+
+###
+
+![c](ej5-c.png)
 
 ## Ejercicio 6 
 
@@ -99,10 +109,38 @@ El segundo sesgo, en el paso 7, es que las distribuciones de X | Y = c (cada atr
 
 ### 1
 
+Como X es una uniforme y el tamaño del intervalo [0.55, 0.65] es 0.1, entonces esperamos que la proporción de instancias que se tenga en dicho intervalo sea %10 
+
 ### 2
+
+Nuevamente $X_1, X_2$ son uniformes. Ambos tamaños de intervalos [0.55, 0.65] y [0.3, 0.4] son de tamaño 0.1. Por lo que se esperaría tener una proporción del $0.1 * 0.1 = 0.01$ de las instancias existentes.
 
 ### 3
 
+Mismo razonamiento. Se esperaría tener una proporción de instancias del $0.1^100 = 10^{-100}$
+
 ### 4
 
+A medida que aumentamos $p$ (la cantidad de atributos de las instancias) es menor la probabilidad de obtener un vecino. Al hacer KNN se tendrá un rendimiento malo. Los vecinos muy probablemente no sean instancias parecidas a la nueva instancia que se desea clasificar. Salvo que se tenga una cantidad inmensa de datos que cubra todo el espacio, pero esto es practicamente inviable.
+
 ### 5
+
+La formula del área del hipercubo con dimensión p: $x^p = a$
+Donde $x$ es la longitud de uno de sus lados, y $a$ es el área.
+
+Por lo tanto 
+
+$$
+x^p = 0.1 \\
+x = \sqrt[p]{0.1}
+$$
+
+($x\geq 0$ por lo que podemos sacar el modulo)
+
+- $p=1 \rightarrow 0.1$
+- $p=2 \rightarrow 0.3162$
+- $p=100 \rightarrow 0.97724$
+
+A medida que aumentamos las dimensiones, necesitamos tomar un hipercubo más grande para garantizar que se toman el $10%$ de las instancias de entrenamiento.
+
+> obs: todo este analisis se hizo suponiendo $X_i$ uniforme. 
