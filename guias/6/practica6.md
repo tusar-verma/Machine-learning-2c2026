@@ -268,16 +268,67 @@ Falso, usa el recall que es el TPR y el FPR.
 
 ### a
 
+$F_1$ es una métrica que ignora el desempeño de la clase negativa. Dependiendo del problema podemos usar la métrica para comparar modelos. En este caso, para el problema de separar perros y gatos, no se tiene una clase "que importa más" que la otra. Por lo tanto para comparar 2 modelos interesa que ambos se desempeñen bien tanto en la clase positiva como en la negativa.
+
+A $F_1$ no le afecta/importa el aumento de TN, a nosotros si nos importa el desemepeño en esa clase.
+
 ### b
 
+Sirve para promediar las métricas aisladas obtenidas para cada una de las clases, permitiendo extraer una única medida (macro, ponderada, micro) globalizada que sí balancea el desempeño en ambas clases (o multiclases).
+Macro promedia, weighted promedio ponderado, micro calcula acumula los contadores globales: suma todos los $TP$, todos los $FP$ y todos los $FN$ del dataset entero, y aplica la fórmula de $F_1$ una sola vez sobre esos totales globales.
+
 ### c
+
+$F_1$ no se ve afectada al aumentar los $TN$
+
 
 ## Ejercicio 11
 
 ### a
 
+- Si todas las clasificaciones son erradas, da $\frac{1}{N} * 0 = 0$. Si se acierta todas las prediccioens se tiene $\frac{1}{N} (\frac{1}{2p} p*N + \frac{1}{2(1-p)} (1-p)N ) = 1$.
+Otara forma de verlo: $\frac{1}{N} ( \frac{1}{2p} \sum \mathbb{1}(TP) + \frac{1}{2(1-p)} \sum \mathbb{1}(TN)) = \frac{1}{2} (TPR + TNR)$. Y esto va de 0 a 1. 
+- Con un clasificador constante 0, el primer termino dentro del parentesis se anula, el segndo se hace $\frac{1}{2(1-p)}(1-p)N$. Dando en total 0.5
+- Si siempre la minoritaria, el segundo termino se cancela y el primero queda:: $\frac{1}{2p}pN$. Dando en total 0.5.
+
 ### b
+
+Como habiamos dicho e nel punto anterior, podemos escribirlo como:
+
+$\frac{1}{2} (TPR + TNR) = \frac{1}{2} \left( \frac{TP}{TP+FN} + \frac{TN}{TN+FP} \right)$
 
 ### c
 
+Hecho en b.
+
 ## Ejercicio 12
+
+La decisión óptima requiere calcular el riesgo esperado ponderando las probabilidades dadas por la matriz de costos y escoger el que minimiza el impacto económico.
+Fórmula a usar: $\text{Costo}(D\vert{}x) = p(M\vert{}x)\cdot Costo(D\vert{}M) + (1 - p(M\vert{}x))\cdot Costo(D\vert{}B)$
+
+(D: decision, M: maligno, B: benigno)
+
+**Instancia I: $\hat{P}(Y=M\vert{}X) = 0.3$ y $\hat{P}(Y=B\vert{}X) = 0.7$**
+
+* Costo(Ignorar): $0.3\cdot 100 + 0.7\cdot 0 = 30$
+* Costo(ReChequear): $0.3\cdot 5 + 0.7\cdot 15 = 1.5 + 10.5 = 12$
+* Costo(Operar): $0.3\cdot 0 + 0.7\cdot 50 = 35$
+* **Decisión Óptima:** ReChequear.
+
+
+
+**Instancia II: $\hat{P}(Y=M\vert{}X) = 0.99$ y $\hat{P}(Y=B\vert{}X) = 0.01$**
+
+* Costo(Ignorar): $0.99\cdot 100 + 0.01\cdot 0 = 99$
+* Costo(ReChequear): $0.99\cdot 5 + 0.01\cdot 15 = 4.95 + 0.15 = 5.1$
+* Costo(Operar): $0.99\cdot 0 + 0.01\cdot 50 = 0.5$
+* **Decisión Óptima:** Operar.
+
+
+
+**Instancia III: $\hat{P}(Y=M\vert{}X) = 0.01$ y $\hat{P}(Y=B\vert{}X) = 0.99$**
+
+* Costo(Ignorar): $0.01\cdot 100 + 0.99\cdot 0 = 1$
+* Costo(ReChequear): $0.01\cdot 5 + 0.99\cdot 15 = 0.05 + 14.85 = 14.9$
+* Costo(Operar): $0.01\cdot 0 + 0.99\cdot 50 = 49.5$
+* **Decisión Óptima:** Ignorar.
