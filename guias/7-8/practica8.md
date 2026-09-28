@@ -125,4 +125,55 @@ Como en las votaciones de cada instancia estamos usando menos árboles que el en
 
 
 ## Ejercicio 5
-## Ejercicio 6
+
+Ada-boast es un meta-algoritmo que entrena estimadores iterativamente. Cada nuevo modelo se especializa en los errores cometidos por los modelos anteriores. Para esto, al finalizar una iteración y calcular la performance, se re-calculan los pesos que se le asigna a los datos de entrenamiento dandole más peso a aquellas en las que se falló la predicción.
+Al finalizar, la predicción global se construye mediante una combinación lineal ponderada de los votos de todos los estimadores en función de su precisión individual.
+
+Es un meta-algoritmo por que el estimador puede ser cualquier algoritmo (LDA, SVM, árboles, etc).
+
+### a
+
+Los weak learners son estimadores muy sesgados. No tienen capacidad para aprender los patrones de muchos datos. La idea es acumular varios de estos, donde cada uno aprende los errores del otro y así en el ensamble, las predicciones se fortalecen (en la votación, se pondera asignandole mayor peso a aquellos learners que mejor les fue).
+El fundamento teórico de Boosting (demostrado por Schapire y Freund) radica en que una combinación ponderada de clasificadores débiles puede converger a un clasificador fuerte (strong learner) con un error de generalización arbitrariamente bajo.
+
+### b
+
+En pocas palabras: inicialmente se asigna peso uniforme a cada instancia. Se entrena un modelo, se calcula el error obtenido y se recalculan los pesos en base a ese error. Si la instancia se clasificó correctamente, disminuye su peso. Si se clasificó incorrectamente aumenta su peso. Además se le asigna un peso (o importancia) al modelo obtenido en base a dicho error. Si es alto, la importancia del modelo se acerca a 0. Una vez recalculado los pesos, se vuelve a entrenar.
+
+Gemini:
+
+Dado un conjunto de entrenamiento con $N$ observaciones $(x_1, y_1), \dots, (x_N, y_N)$ con etiquetas $y_i \in \{-1, +1\}$:
+- Inicialización: Se asigna un peso uniforme a todas las instancias en la iteración $t = 1$:
+$$w_1(i) = \frac{1}{N} \quad \forall i \in \{1, \dots, N\}$$
+
+- Cálculo del error ponderado: Con los pesos de la ronda $t$, se entrena el modelo base $h_t(x)$ y se mide su tasa de error ponderada $\epsilon_t$:
+
+$$\epsilon_t = \sum_{i: y_i \ne h_t(x_i)} w_t(i)$$
+
+- Cálculo del peso del modelo ($\alpha_t$): Se determina la importancia o confianza que tendrá el clasificador $h_t$ en la decisión final:
+
+$$\alpha_t = \frac{1}{2} \ln\left( \frac{1 - \epsilon_t}{\epsilon_t} \right)$$
+
+Si $\epsilon_t$ es bajo, $\alpha_t$ es un valor positivo grande; si $\epsilon_t \to 0.5$, $\alpha_t \to 0$.
+
+- Actualización de pesos de las instancias: Los pesos para la siguiente iteración $t+1$ se recalculan aplicando un factor multiplicativo según el acierto o desacierto:
+
+$$w_{t+1}(i) = \frac{w_t(i) \exp\left( -\alpha_t \, y_i \, h_t(x_i) \right)}{Z_t}$$
+
+donde $Z_t$ es la constante de normalización $\sum_{i=1}^N w_t(i) \exp(-\alpha_t y_i h_t(x_i))$ que garantiza $\sum_{i=1}^N w_{t+1}(i) = 1$:
+    - Instancia bien clasificada ($y_i = h_t(x_i)$): El exponente es $-\alpha_t$, por lo que su peso disminuye. 
+    - Instancia mal clasificada ($y_i \ne h_t(x_i)$): El exponente es $+\alpha_t$, por lo que su peso aumenta, obligando al siguiente clasificador a priorizar su resolución correcta
+
+### c
+
+En pocas palabras: los criterios de corte se corresponden a detección de sobreajuste sobre un conjunto de control; si la condición de weak learner se rompe (los modelos no aprender nada nuevo (cometen los mismos errores y los pesos no se ajustan) o son peores que el azar); alcanzado un máximo T que se setea como hiperparámetro (para evitar ajuste a ruido). 
+
+Gemini:
+
+El número total de iteraciones/modelos $T$ se determina mediante los siguientes criterios prácticos y analíticos:
+
+- Parada por convergencia anticipada (Early Stopping): Se monitorea el error sobre un conjunto de validación independiente (o validación cruzada). Si el error de validación deja de descender durante un número determinado de rondas y comienza a incrementarse, se detiene el entrenamiento para evitar el sobreajuste.
+- Criterio de corte algorítmico interno:
+  - Fallo del clasificador base: Si en alguna ronda un modelo base obtiene un error $\epsilon_t \ge 0.5$, el clasificador ya no cumple la condición de weak learner y el algoritmo se interrumpe de inmediato. (si $\epsilon_t > 0.5$ el modelo se está equivocando más de lo que está acertando; y si $\epsilon_t = 0.5$ La fracción dentro del logaritmo es $\frac{0.5}{0.5} = 1$. Como $\ln(1) = 0$, resulta $\alpha_t = 0$. El modelo recibe un peso de voto nulo en la decisión final; no aporta ninguna información y el algoritmo se estanca).
+  - Ajuste perfecto: Si un clasificador alcanza $\epsilon_t = 0$, su peso $\alpha_t$ tiende a infinito y el ciclo se detiene por haber resuelto el conjunto de entrenamiento. (AdaBoost necesita identificar qué instancias se equivocaron para subirles el peso y enfocarse en ellas en la siguiente ronda. Si no hubo ninguna equivocación, no hay errores residuales que corregir ni pesos que reasignar. El ensamble ya resolvió el entrenamiento al 100%, por lo que la iteración concluye de inmediato)
+- Control de sobreajuste ante ruido: Aunque en problemas sin ruido AdaBoost amplía los márgenes de separación sin sobreajustar fácilmente, en presencia de ruido o datos atípicos (outliers), un $T$ excesivo concentra pesos desproporcionados en etiquetas espurias y degrada fuertemente el rendimiento. En tales escenarios, $T$ debe regularse como un hiperparámetro acotado. 
