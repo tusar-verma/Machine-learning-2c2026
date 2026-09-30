@@ -99,7 +99,7 @@ Idem a f. (Clasificación con relación entre clases $\rightarrow$  regresión)
 
 ### d bis
 
-No cambia. Se debe clasificar en gasto > $50k o no. No importa si se tiene etiqetas reales (dato de cuanto se fue gastando en el tiempo por ejemplo) o binarias (si o no hubo gasto > $50k en los meses pasados)
+No cambia. Se debe clasificar en gasto > $50k$ o no. No importa si se tiene etiqetas reales (dato de cuanto se fue gastando en el tiempo por ejemplo) o binarias (si o no hubo gasto > $50k$ en los meses pasados)
 
 ## Ejercicio 2.4
 
