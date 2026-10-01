@@ -119,7 +119,7 @@ Nuevamente $X_1, X_2$ son uniformes. Ambos tamaños de intervalos [0.55, 0.65] y
 
 ### 3
 
-Mismo razonamiento. Se esperaría tener una proporción de instancias del $0.1^100 = 10^{-100}$
+Mismo razonamiento. Se esperaría tener una proporción de instancias del $0.1^{100} = 10^{-100}$
 
 ### 4
 
