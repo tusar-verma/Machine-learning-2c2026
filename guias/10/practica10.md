@@ -49,8 +49,128 @@ Como multiplicar por una constante positiva $c^2 > 0$ no cambia la ubicación de
 La normalización no cambia el MSE sin regularización ya que el el algoritmo compensa este cambio de escala. Ahora si usamos regularización y comparamos los MSE (sin el termino de regularizacion) normalizado contra no normalizado, si cambia el MSE por que justamente la regularización cambia los pesos, y por lo tanto las predicciones
 
 ## Ejercicio 5
+
+### 1
+```python
+def descenso_gradiente(g: [float] -> float, gd: [float] -> [float], z_init: [float], alpha: float, num_iter: int, tol: float):
+    """
+    Descenso de gradiente para minimizar g.
+    Args:
+    g: La función a optimizar.
+    dg: El gradiente de la función.
+    z_init: Valor inicial.
+    alpha: El “learning rate”.
+    num_iterations: Máx iteraciones.
+    tol: Tolerancia para la convergencia.
+    """
+    z = z_init
+    for i in range(num_iter):
+        gradiente = gd(z)
+        z_new = z - alpha * gradiente
+        if (abs(g(z_new) - g(z)) < tol):
+            break
+        
+        z = z_new
+
+    return z
+```
+
+### 2
+Para regresión lineal se usa para conseguir el vector de pesos que minimice el MSE.
+$$\text{MSE}_{X,y}(w) = \frac{1}{n} \sum_{i=1}^{n} \left(\hat{h}_w(x^{(i)}) - y^{(i)}\right)^2 = \frac{1}{n} \sum_{i=1}^{n} \left(w_0 + \sum_{j=1}^p w_j x_j^{(i)} - y^{(i)}\right)^2$$
+
+### 3
+Se calculan las derivadas parciales con respecto a cada peso de la función MSE.
+$$\frac{\partial}{\partial w_j} \text{MSE}(w) = \frac{\partial}{\partial w_j} \left( \frac{1}{n} \sum_{i=1}^n (\hat{y}^{(i)} - y^{(i)})^2 \right)$$
+$$\nabla_w \text{MSE}_{X,y}(w) = \frac{2}{n} \sum_{i=1}^n (\hat{h}_w(x^{(i)}) - y^{(i)}) x^{(i)} = \frac{2}{n} X^T (Xw - y)$$
+
+### 4
+
+```python
+def grad_desc_mini_batch(X_train, y_train, alpha, z_init, g, gd):
+    z = z_init
+    while (no se cumpla criterio de detención):
+        # epoch
+        while (haya datos de entrenamiento para hacer batch):
+            X_batch, y_batch = Muestrear_batch_sin_reposicion(X_train, y_train)
+            grad_batch = gd(X_batch, y_batch, z)
+
+            z = z - alpha * grad_batch
+    
+    return z
+
+```
+
+Para regresión lineal g es el MSE y gd es el gradiente con respecto al batch particular que se tiene en la iteración. Notar en el punto 3 que la fórmula del gradiente del MSE depende del conjunto de datos que se use. Es decir, tanto el MSE y su gradiente dependen de los datos que se usen para calcularlo. Y en cada batch entonces se tiene una superficie distinta en el que se calcula el proximo movimiento de z. 
+Se espera que los batchs sean parecidos a los datos completos en distribución y acerquen al mínimo real. Además como es un subconjunto, se puede tener la ventaja de resolver problemas de divergencia o saltearse minimos locales.
+
+Al cambiar el lote en cada iteración, la función de pérdida y el gradiente estimado cambian ligeramente de forma. Ese "ruido estocástico" introduce oscilaciones que ayudan a escapar de mínimos locales o puntos de ensilladura en superficies no convexas.   Eficiencia computacional: Permite entrenar con conjuntos de datos masivos que no caben enteros en memoria RAM. 
+
 ## Ejercicio 6
+
+### A
+
+En ambos los pesos $w_1, \dots, w_p$ se settean en 0. Luego veamos que $w_0$ toma el valor de la media de las predicciones: de la formula del MSE tenemos que queremos minimizar
+$$f(w_0) = \frac{1}{n} \sum_{i=1}^n (w_0 - y^{(i)})^2$$ 
+
+Derivamos respecto a $w_0$ e igualamos a 0:Aplicando la regla de la cadena:
+
+$$\frac{df}{dw_0} = \frac{2}{n} \sum_{i=1}^n (w_0 - y^{(i)}) = 0$$
+
+Despejamos $w_0$:
+
+Distribuimos la sumatoria:
+
+$$\sum_{i=1}^n w_0 - \sum_{i=1}^n y^{(i)} = 0$$
+
+Como $w_0$ es una constante sumada $n$ veces, $\sum_{i=1}^n w_0 = n \cdot w_0$:
+
+$$n \cdot w_0 = \sum_{i=1}^n y^{(i)} \implies w_0 = \frac{1}{n} \sum_{i=1}^n y^{(i)} = \bar{y}$$
+
+### B
+
+Como en la regularización no e toma en cuenta el valor de $w_0$ pudimos hacer el analisis del punto a. Ahora en este punto nos dicen que también lo  penalizamos, por lo que cuando $\lambda$ tienda a infinito, el algoritmo setteará $w_0$ también en 0 para minimizar la función de costo. El modelo entocnes siempre predecirá 0.  
+
+### C
+
+Recordemos que minimizar la función de costo regularizada es equivalente a resolver un problema de optimización con restricciones:
+
+* **Problema 1 (Sin penalizar $w_0$):**
+
+$$\min_{w} \text{SSE}(w) \quad \text{sujeto a} \quad \sum_{j=1}^p \vert{}w_j\vert{}^q \le s$$
+
+*(donde $q=1$ para Lasso y $q=2$ para Ridge, y $s$ es una constante asociada a $\lambda$)*.
+
+Llamemos al conjunto de soluciones permitidas:
+
+$$S_1 = \left\{ (w_0, w_1, \dots, w_p) \in \mathbb{R}^{p+1} : \sum_{j=1}^p \vert{}w_j\vert{}^q \le s \right\}$$
+
+*(aquí $w_0$ puede tomar cualquier valor real libremente)*.
+
+* **Problema 2 (Penalizando también $w_0$):**
+
+$$\min_{w} \text{SSE}(w) \quad \text{sujeto a} \quad \vert{}w_0\vert{}^q + \sum_{j=1}^p \vert{}w_j\vert{}^q \le s$$
+
+Llamemos al nuevo conjunto de soluciones permitidas:
+
+$$S_2 = \left\{ (w_0, w_1, \dots, w_p) \in \mathbb{R}^{p+1} : \vert{}w_0\vert{}^q + \sum_{j=1}^p \vert{}w_j\vert{}^q \le s \right\}$$
+
+* **Relación entre ambos conjuntos:**
+Como $\vert{}w_0\vert{}^q \ge 0$, cualquier vector que cumpla la condición de $S_2$ automáticamente cumple la de $S_1$:
+
+$$\sum_{j=1}^p \vert{}w_j\vert{}^q \le \vert{}w_0\vert{}^q + \sum_{j=1}^p \vert{}w_j\vert{}^q \le s \implies S_2 \subseteq S_1$$
+
+* **Conclusión **
+Si minimizamos la misma función objetivo $\text{SSE}(w)$ en un conjunto $S_1$ y en un subconjunto $S_2 \subseteq S_1$, el mínimo sobre el subconjunto siempre es mayor o igual:
+
+$$\min_{w \in S_2} \text{SSE}(w) \ge \min_{w \in S_1} \text{SSE}(w)$$
+
+Por lo tanto, la suma de errores al cuadrado penalizando la constante es necesariamente **mayor o igual** que sin penalizarla.
+
 ## Ejercicio 7
+
+
+
 ## Ejercicio 8
 ## Ejercicio 9
 ## Ejercicio 10
