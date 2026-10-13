@@ -169,8 +169,109 @@ Por lo tanto, la suma de errores al cuadrado penalizando la constante es necesar
 
 ## Ejercicio 7
 
+### 1
 
+Falso, es la misma. Lo que cambia es la función $\hat{h}$ de hipótesis/predicción.
+
+### 2
+
+Falso, depende de la función de predicción. Para regresión lineal si es convexa.
+
+### 3
+
+II, IV y V correctas
+
+I incorrecta, los datos estan fijos (en el caso de gradient dicsent) y lo que varia son los pesos.
+
+III correcta por estar en contexto de regresión lineal.
 
 ## Ejercicio 8
-## Ejercicio 9
-## Ejercicio 10
+
+### 1
+
+Falso, se minimiza la función de perdida y no los pesos
+
+### 2
+
+Verdadero, entrenar una función de regresión lineal es minimizar la función MSE que depende de los pesos.
+
+### 3
+
+Falso, regularizar es minimizar el MSE poniendo restricciones adicionales a los pesos.
+
+### 4
+
+Verdadero.
+
+### 5
+
+Falso, los pesos dependen fuertemente de las magnitudes de las unidades de medida, más aún si se usa regularización.
+
+### 6
+
+Verdadero
+
+### 7
+
+Falso. Se debe agregar la regularización Ridge.
+
+## Ejercicio 10 (gemini)
+
+### 1. Gráfico comparativo de las funciones de pérdida 
+
+```mermaid
+xychart-beta
+    title "Pérdida vs. Error e = (y - y_hat)"
+    x-axis "Error e" [-3, -2, -1, 0, 1, 2, 3]
+    y-axis "Pérdida L(e)" 0 --> 9
+    line "MSE: e^2" [9, 4, 1, 0, 1, 4, 9]
+    line "MAE: |e|" [3, 2, 1, 0, 1, 2, 3]
+    line "Huber (delta=1)" [2.5, 1.5, 0.5, 0, 0.5, 1.5, 2.5]
+```
+
+### 2. Comportamiento de la función Huber Loss 
+
+La función de pérdida de Huber combina lo mejor de dos mundos mediante un comportamiento por tramos condicionado por el umbral $\delta$:
+
+*  **Para errores pequeños ($\vert{}y - \hat{y}\vert{} \le \delta$):**
+Se comporta como **MSE** (es una función cuadrática: $\frac{1}{2}(y-\hat{y})^2$). Esto asegura que alrededor de cero la función sea completamente diferenciable, suave y tenga derivadas continuas, lo que permite que el descenso de gradiente converja con rapidez y precisión sin saltos bruscos.
+
+
+* **Para errores grandes ($\vert{}y - \hat{y}\vert{} > \delta$):**
+Se comporta como **MAE** (crecimiento lineal con pendiente constante $\pm \delta$). A diferencia de MSE, donde un error grande se eleva al cuadrado y genera una pérdida descomunal, en Huber el castigo crece solo de manera lineal.
+
+
+
+---
+
+### 3. Impacto de variar el umbral $\delta$
+
+El parámetro $\delta$ regula qué tan permisivo es el modelo con los residuos antes de tratarlos como desviaciones atípicas:
+
+* **Si se aumenta $\delta$ ($\delta \to \infty$):**
+Casi todos los errores quedan dentro del intervalo $[-\delta, \delta]$. La función de pérdida converge hacia el **Error Cuadrático Medio (MSE)** estándar. El ajuste da más peso a los puntos lejanos y se vuelve más sensible al ruido.
+
+
+* **Si se disminuye $\delta$ ($\delta \to 0$):**
+Casi cualquier error supera el umbral $\delta$, por lo que domina el tramo lineal $\delta \vert{}y - \hat{y}\vert{}$. La pérdida se aproxima al **Error Absoluto Medio (MAE)**. El modelo se enfoca en la mediana de los datos en lugar de la media.
+
+
+
+---
+
+### 4. Manejo de *outliers* y casos de uso
+
+* **Comparación con MSE y MAE:**
+* **MSE (Mínimos Cuadrados):** Muy vulnerable a *outliers*. Como eleva el error al cuadrado, un único valor anómalo produce un gradiente enorme que "arrastra" y tuerce toda la recta para intentar acercarse a él.
+
+
+* **MAE:** Muy robusto ante *outliers* (su derivada es fija $\pm 1$), pero su derivada no está definida en $e = 0$, lo que puede provocar oscilaciones en la optimización numérica cerca del mínimo.
+
+
+* **Huber:** Mantiene la robustez de MAE frente a valores atípicos (su gradiente queda acotado a $\pm \delta$) y a la vez conserva la suavidad y convergencia limpia de MSE en el origen.
+
+
+
+
+* **¿Cuándo es útil usar Regresión de Huber?**
+Es ideal en problemas donde se sabe o sospecha que el conjunto de datos contiene mediciones corruptas, errores de tipeo o valores atípicos que no pueden limpiarse fácilmente de forma manual, y se requiere un entrenamiento estable por descenso de gradiente sin que las predicciones colapsen.
