@@ -132,9 +132,34 @@ El sesgo óptimo $w_0^*$ converge al logit (*log-odds*) de la proporción de cla
 
 ### 1
 
-Podemos inferir el valor de $w_0$ cuando $x_1 = 0$.
+La función sigmoide(x) es estrictamente creciente. Como las figuras 1, 2 y 3 son decrecientes, entonces $z^(i)$ debe ser decreciente. Luego $w_1 < 0$ para la fila superior.
+
+Con el mismo argumento, en las 3 figuras inferiores $w_1 > 0$.
+
+Una interpretación es que el signo hará que aumente o disminuya la probabilidad de la clase positiva al aumentar el atributo $x_1$
+
+### 2
+
+Podemos ordenar los valores de $w_0$ viendo cuando la sigmoide toma el valor 0.5 (el punto de inflexión).
+
+El punto de inflexión donde $\sigma(z) = 0.5$ ocurre exactamente cuando $z = 0 \iff w_0 + w_1 x_1 = 0 \iff x_1^* = -\frac{w_0}{w_1}$.
+
+**Fila superior ($w_1 < 0$):**
+Dado que $w_1 < 0$, tenemos que $x_1^* = -\frac{w_0}{w_1} = \frac{w_0}{\vert{}w_1\vert{}}$. Por ende, un mayor $w_0$ desplaza el cruce por $0.5$ más hacia la derecha:
+1. Gráfico 1 (izquierda): el salto de $0.5$ está en $x_1 < 0$ $\implies$ menor $w_0$.
+2. Gráfico 2 (centro): el salto de $0.5$ está centrado cerca de $x_1 \approx 0$ $\implies$ $w_0 \approx 0$.
+3. Gráfico 3 (derecha): el salto de $0.5$ está en $x_1 > 0$ $\implies$ mayor $w_0$.
+
+* **Orden de menor a mayor $w_0$:** Izquierda $<$ Centro $<$ Derecha.
+
+**Fila inferior ($w_1 > 0$):**
+Dado que $w_1 > 0$, tenemos que $x_1^* = -\frac{w_0}{w_1}$. Por ende, un mayor $w_0$ desplaza el cruce por $0.5$ hacia la izquierda:
+1. Gráfico 1 (izquierda): cruza $0.5$ muy a la derecha ($x_1 > 0$) $\implies$ $w_0$ muy negativo (el menor).
+2. Gráfico 2 (centro): cruza $0.5$ cerca de $x_1 \approx 0$ $\implies$ $w_0 \approx 0$.
+3. Gráfico 3 (derecha): la curva ya vale $>0.5$ incluso para $x_1 = -1000$, cruzando $0.5$ muy a la izquierda $\implies$ $w_0$ grande y positivo.
 
 
+* **Orden de menor a mayor $w_0$:** Izquierda $<$ Centro $<$ Derecha.
 
 ## Ejercicio 4
 
