@@ -8,7 +8,7 @@ $y^(i)$ es la etiqueta real y $p^{i}$ es la probabilidad predicha por el modelo
 
 ### b
 
-![](11-1b.png)
+![](img/11-1b.png)
 
 ### c
 

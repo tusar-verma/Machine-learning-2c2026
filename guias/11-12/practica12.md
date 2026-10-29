@@ -27,6 +27,83 @@ Falso. Siguiendo la idea anterior, la capa oculta relaciona los pesos. Luego al 
 
 ## Ejercicio 2
 
+Se tiene 2 entradas $X_1$ y $X_2$ binarias. Y una salida $Y$ binaria.
+
+Para el caso del AND queremos modelar un perceptrón simple que cumpla la siguiente tabla:
+
+| X_1 | X_2 | Y |
+|-----|-----|---|
+| 0   | 0   | 0 |
+| 0   | 1   | 0 |
+| 1   | 0   | 0 |
+| 1   | 1   | 1 |
+
+$Y = ReLU(-1 + X_1 * 1 + X_2 * 1)$
+
+Par el caso del OR:
+
+| X_1 | X_2 | Y |
+|-----|-----|---|
+| 0   | 0   | 0 |
+| 0   | 1   | 1 |
+| 1   | 0   | 1 |
+| 1   | 1   | 1 |
+
+
+$Y = g(-0.5 + X_1 * 1 + X_2 * 1)$
+
+con g(x) = 0 si x <= 0 o g(x) = 1 si x > 0.
+
+NOR:
+
+| X_1 | X_2 | Y |
+|-----|-----|---|
+| 0   | 0   | 1 |
+| 0   | 1   | 0 |
+| 1   | 0   | 0 |
+| 1   | 1   | 0 |
+
+$Y = g(1 + X_1 * (-1) + X_2 * (-1))$
+
+con g(x) = 0 si x <= 0 o g(x) = 1 si x > 0.
+
+NAND:
+
+| X_1 | X_2 | Y |
+|-----|-----|---|
+| 0   | 0   | 1 |
+| 0   | 1   | 1 |
+| 1   | 0   | 1 |
+| 1   | 1   | 0 |
+
+$Y = g(2 + X_1 * (-1) + X_2 * (-1))$
+
+con g(x) = 0 si x <= 0 o g(x) = 1 si x > 0.
+
+El XOR no es separable linealmente. Un perceptrón simple solo tiene la capacidad de establecer una frontera lineal. La función de activación solo aporta no linealidad a la salida, pero no a la frontera. Se necesita al menos 2 perceptrones simples:
+
+XOR:
+
+| X_1 | X_2 | Y |
+|-----|-----|---|
+| 0   | 0   | 0 |
+| 0   | 1   | 1 |
+| 1   | 0   | 1 |
+| 1   | 1   | 0 |
+
+(sacado del DL goodfellow cap 6)
+$Y = w^T max\{0, W^Tx + c\} + b$
+$W^T = \begin{bmatrix} 1 \\\ -2 \end{bmatrix}$
+
+$c = \begin{bmatrix} 0 \\\ -1 \end{bmatrix}$
+
+$W = \begin{bmatrix} 1 \ 1 \\\ 1 \ 1 \end{bmatrix}$
+
+$b = 0$
+
+
+## Ejercicio 3
+
 La idea es que al tener activaciones lineales, todas las operaciones matriciales de todas las capas menos la ultima se puede reducir a una sola matriz. Finalmente, con la última activación sigmoidea, se tiene la regresión logística.
 
 No tiene sentido usar muchas capas.
@@ -94,12 +171,76 @@ donde $w^* = w^{[L]} W_{\text{equiv}}$ y $b^* = w^{[L]} b_{\text{equiv}} + b^{[L
 Cualquier combinación de capas lineales intermedias colapsa algebraicamente en una única transformación matricial afín. Al aplicar la sigmoide al final, el modelo completo resultante es indistinguible de una **regresión logística**. Por ello, usar múltiples capas lineales intermedias no aporta capacidad representacional adicional respecto a entrenar un único clasificador logístico directo sobre las entradas.
 </details>
 
-## Ejercicio 3
 ## Ejercicio 4
+
+### a
+
+![](img/12ej4a.png)
+
+$W^1: 4 \times 4, W^2: 5 \times 2$ (bias incluido). Total$=26$
+
+### b
+
+- Pesos de entrada a primera capa oculta: $I \times N_1 + N_1$
+- Pesos de capa oculta a capa oculta: $N_i \times N_{i+1} + N_{i+1}$
+- Pesos última capa oculta a salida: $N_M \times O + O$
+
+Total: $I \times N_1 + N_1 + N_M \times O + O + \sum_{i=2}^{M-1}(N_i \times N_{i+1} + N_{i+1})$
+
+### c
+
+Reemplazando en la formula anterior por N_h:
+
+$O(N_h*M) = O(M)$
+
 ## Ejercicio 5
+
+### a
+
+Fórmulas de la redVersión explícita con biases:  
+
+$Z^{[1]} = X W^{[1]} + \mathbf{1} (b^{[1]})^T, \quad A^{[1]} = g_i(Z^{[1]})$
+
+$Z^{[2]} = A^{[1]} W^{[2]} + \mathbf{1} (b^{[2]})^T, \quad A^{[2]} = g_i(Z^{[2]})$   
+
+$Z^{[3]} = A^{[2]} W^{[3]} + \mathbf{1} (b^{[3]})^T, \quad Y = g_o(Z^{[3]})$   
+
+
+Versión compacta con matrices extendidas:   
+
+$A^{[1]} = g_i(X' W^{[1]'})$   
+
+$A^{[2]} = g_i(A^{[1]'} W^{[2]'})$
+
+$Y = g_o(A^{[2]'} W^{[3]'})$
+
+
+### b
+
+* $X \in \mathbb{R}^{5 \times 3} \implies n = 5$ instancias, $p_0 = 3$ características de entrada.
+
+* Para que $X W^{[1]}$ sea multiplicable: **$W^{[1]} \in \mathbb{R}^{3 \times 2}$**.
+* Salida de capa 1: **$A^{[1]} \in \mathbb{R}^{5 \times 2}$**.
+* Para multiplicar $A^{[1]} W^{[2]}$: **$W^{[2]} \in \mathbb{R}^{2 \times 1}$**.
+* Salida de capa 2: **$A^{[2]} \in \mathbb{R}^{5 \times 1}$**.
+* Para multiplicar $A^{[2]} W^{[3]}$: **$W^{[3]} \in \mathbb{R}^{1 \times 2}$**.
+* Salida final de la red: **$Y \in \mathbb{R}^{5 \times 2}$**.
+
+
 ## Ejercicio 6
+
+### a
+
+![alt text](img/12ej6.png)
+
+
 ## Ejercicio 7
 ## Ejercicio 8
 ## Ejercicio 9
 ## Ejercicio 10
+
+### a
+
+Verdadero, la sigmoide transforma la salida en una distribución de probabilidades. Suman 1.
+
 ## Ejercicio 11
