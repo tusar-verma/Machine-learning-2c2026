@@ -235,12 +235,59 @@ $Y = g_o(A^{[2]'} W^{[3]'})$
 
 
 ## Ejercicio 7
-## Ejercicio 8
-## Ejercicio 9
-## Ejercicio 10
+
+### a
+
+![](img/12-7-a.png)
+
+### b
+
+![](img/12-7-b.png)
+
+### c
+
+![](img/12-7-c.png)
+
+### d
+
+![](img/12-7-d.png)
+
+### e
+
+![](img/12-7-e.png)
+
+### f
+
+El nodo que representa una instancia x, ahora sería un vector (o matriz si tinee más de un atributo). El nodo de etiqueta y ahora sería un vector, y las operaciones se cambian por operaciones vectoriales y matriciales.
+
+Las funciones de activaciones se aplican a cada elemento de un vector.
+
+Finalmente se agrega un nodo más que corresponde al promedio del costo de las predicciones de cada instancia. En el calculo del gradiente, cada parámetro recibe gradientes de cada instancia (por la regla de la cadena y derivada de la suma es la suma de derivadas).
 
 ### a
 
 Verdadero, la sigmoide transforma la salida en una distribución de probabilidades. Suman 1.
 
-## Ejercicio 11
+## Ejercicio 8
+
+### a
+
+![alt text](img/12-8-a.png)
+
+### b
+
+![alt text](img/12-8-b.png)
+
+### c
+
+![alt text](img/12-8-c.png)
+
+### d
+
+![alt text](img/12-8-d.png)
+
+### e
+
+$\delta_j^{l}$ mide la tasa de cambio de la función de pérdida con respecto a el valor de la entrada de la neurona $j$ de la capa $l$.
+
+Si este valor es 0, implica que cambios en los pesos de la entrada y bias de esta neurona no cambiarían el costo. Por lo tanto, en el algoritmo de GD, no se actualizarían sus valores. (neurona saturada o gradiente desvanecido) 
