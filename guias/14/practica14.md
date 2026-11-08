@@ -1,6 +1,14 @@
 # Guia 14
 
 ## Ejercicio 1
+
+### a
+
+
+
+### b
+
+
 ## Ejercicio 2
 ## Ejercicio 3
 ## Ejercicio 4
